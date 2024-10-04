@@ -75,11 +75,18 @@ class Dictionary(object):
         return len(self.idx2word)
 
     def read_tag(domain, file_name, tag, freq_cutoff=-1, init_dict=True):
+        print("Dict read tag", domain, file_name, tag)
         token_freqs = OrderedDict()
         with open(file_name, 'r') as f:
             for line in f:
+                #  print each line
+                # print(line)
                 tokens = line.strip().split()
+                # print each word seperated by a space
+                # print(tokens)
                 tokens = get_tag(tokens, tag)
+                # print the string in between the tokens <input or dialogue>
+                # print(tokens)
                 for token in tokens:
                     token_freqs[token] = token_freqs.get(token, 0) + 1
         dictionary = Dictionary(init=init_dict)
@@ -87,7 +94,13 @@ class Dictionary(object):
         for token, freq in token_freqs:
             if freq > freq_cutoff:
                 dictionary.add_word(token)
+
+        # dictionary.print()
         return dictionary
+    
+    def print(self):
+        for k,v in self.word2idx.items():
+            print(k,v)
 
 
 class ItemDictionary(Dictionary):
@@ -102,8 +115,8 @@ class ItemDictionary(Dictionary):
         return self.word2idx[token]
 
     def read_tag(domain, file_name, tag, init_dict=False):
+        print("item dict read_tag")
         dictionary = ItemDictionary(domain.selection_length() // 2, init=False)
-
         def generate(item_id, selection=[]):
             if item_id >= dictionary.selection_size:
                 dictionary.add_word(' '.join(selection))
@@ -114,10 +127,9 @@ class ItemDictionary(Dictionary):
                 selection.pop()
 
         generate(0)
-
+        # dictionary.print()
         for token in ['<disagree>', '<no_agreement>', '<disconnect>']:
             dictionary.add_word(' '.join([token] * dictionary.selection_size))
-
         return dictionary
 
 
@@ -140,17 +152,22 @@ class CountDictionary(Dictionary):
                 tokens = line.strip().split()
                 tokens = get_tag(tokens, tag)
                 key = CountDictionary.get_key(tokens)
+                # get the keys 1 2 3 4 5 6 then key is 1_3_5
+                # print("key", key)
                 token_freqs[key] = token_freqs.get(key, 0) + 1
         token_freqs = sorted(token_freqs.items(), key=lambda x: x[1], reverse=True)
         dictionary = CountDictionary(init=init_dict)
         for token, freq in token_freqs:
                 dictionary.add_word(token)
+        # dictionary.print()
         return dictionary
 
 
 def create_dicts_from_file(domain, file_name, freq_cutoff):
+    print("create_dicts_from_file", domain, file_name, freq_cutoff)
     assert os.path.exists(file_name)
     word_dict = Dictionary.read_tag(domain, file_name, 'dialogue', freq_cutoff=freq_cutoff)
+    # TODO: dont know why itemDict is storing all perumtation though
     item_dict = ItemDictionary.read_tag(domain, file_name, 'output', init_dict=False)
     item_dict_old = Dictionary.read_tag(domain, file_name, 'output', init_dict=False)
     context_dict = Dictionary.read_tag(domain, file_name, 'input', init_dict=False)

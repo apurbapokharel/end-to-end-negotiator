@@ -69,7 +69,7 @@ pip install visdom
 ### Action Classifier
 We use an action classifier to compare performance of various models. The action classifier is described in section 3 of (2). It can be trained by running the following command:
 ```
-python train.py \
+python3 train.py \
 --cuda \
 --bsz 16 \
 --clip 2.0 \

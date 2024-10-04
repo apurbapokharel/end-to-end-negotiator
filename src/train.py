@@ -102,22 +102,22 @@ def main():
 
 
     args = parser.parse_args()
-
-    utils.use_cuda(args.cuda)
-    utils.set_seed(args.seed)
+    print("args", args)
+    # utils.use_cuda(args.cuda)
+    # utils.set_seed(args.seed)
 
     domain = get_domain(args.domain)
     model_ty = models.get_model_type(args.model_type)
     corpus = model_ty.corpus_ty(domain, args.data, freq_cutoff=args.unk_threshold,
         verbose=True, sep_sel=args.sep_sel)
-    model = model_ty(corpus.word_dict, corpus.item_dict_old,
-        corpus.context_dict, corpus.count_dict, args)
-    if args.cuda:
-        model.cuda()
-    engine = model_ty.engine_ty(model, args, verbose=True)
-    train_loss, valid_loss, select_loss, extra = engine.train(corpus)
+    # model = model_ty(corpus.word_dict, corpus.item_dict_old,
+    #     corpus.context_dict, corpus.count_dict, args)
+    # if args.cuda:
+    #     model.cuda()
+    # engine = model_ty.engine_ty(model, args, verbose=True)
+    # train_loss, valid_loss, select_loss, extra = engine.train(corpus)
 
-    utils.save_model(engine.get_model(), args.model_file)
+    # utils.save_model(engine.get_model(), args.model_file)
 
 
 if __name__ == '__main__':
